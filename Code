@@ -1,0 +1,332 @@
+# lear
+# Space Craft
+
+# Welcome to the Space game
+# This game is made in pygame
+
+import pygame
+
+pygame.init()
+if __name__ == "__main__":
+
+    # Screen
+    WIDTH = 1000
+    HEIGHT = 800
+
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    background = pygame.image.load("space_bg.jpg")
+
+    # Icon
+    icon = pygame.image.load("ufo.png")
+    pygame.display.set_icon(icon)
+
+    # Title
+    pygame.display.set_caption("Spacecraft")
+
+    # Player
+    class Player:
+        def __init__(self, me, me_X, me_Y, my_bullet, bullet_X, bullet_Y):
+            self.me = me
+            self.me_X = me_X
+            self.me_Y = me_Y
+            self.my_bullet = my_bullet
+            self.bullet_X = bullet_X
+            self.bullet_Y = bullet_Y
+
+        def get_me(self):
+            screen.blit(self.me, (self.me_X, self.me_Y))
+
+        def get_bullet_1(self):
+            screen.blit(self.my_bullet, (self.bullet_X, self.bullet_Y))
+
+    spaceship = pygame.image.load("spaceship.png")
+    x_change = 0
+    y_change = 0
+
+    bullet_1 = pygame.image.load("bullet_1.png")
+
+    DONE_1 = Player(spaceship, 440, 650, bullet_1, 456, 655)
+
+    # Enemy
+    class Enemy:
+        def __init__(self, enemy_1, enemy_1_X, enemy_1_Y, bullet_1, bullet_1_X, bullet_1_Y, enemy_2, enemy_2_X, enemy_2_Y):
+            self.enemy_1 = enemy_1
+            self.enemy_1_X = enemy_1_X
+            self.enemy_1_Y = enemy_1_Y
+            self.bullet_1 = bullet_1
+            self.bullet_1_X = bullet_1_X
+            self.bullet_1_Y = bullet_1_Y
+
+            self.enemy_2 = enemy_2
+            self.enemy_2_X = enemy_2_X
+            self.enemy_2_Y = enemy_2_Y
+
+        def get_enemy_1(self):
+            screen.blit(self.enemy_1, (self.enemy_1_X, self.enemy_1_Y))
+
+        def get_bullet_1(self):
+            screen.blit(self.bullet_1, (self.bullet_1_X, self.bullet_1_Y))
+
+        def get_enemy_2(self):
+            screen.blit(self.enemy_2, (self.enemy_2_X, self.enemy_2_Y))
+
+    enemy_1 = pygame.image.load("ufo_enemy_1.png")
+    enemy_1_x_change = 1
+
+    enemy_2 = pygame.image.load("ufo_enemy_2.png")
+    enemy_2_x = 300
+    enemy_2_y = 200
+    enemy_2_x_change = 1.5
+
+    enemy_bullet = pygame.image.load("enemy_bullet.png")
+
+    DONE_2 = Enemy(enemy_1, 440, 120, enemy_bullet, 456, 125, enemy_2, enemy_2_x, enemy_2_y)
+
+    # Statistics
+
+    text = pygame.font.Font("freesansbold.ttf", 40)
+
+    class Static:
+        def __init__(self, heart, dark_heart, score, level):
+            self.heart = heart
+            self.dark_heart = dark_heart
+            self.score = score
+            self.level = level
+
+
+        def get_heart_1(self):
+            screen.blit(self.heart, (30, 30))
+
+        def get_heart_2(self):
+            screen.blit(self.heart, (70, 30))
+
+        def get_heart_3(self):
+            screen.blit(self.heart, (110, 30))
+
+        def get_dark_heart_3(self):
+            screen.blit(self.dark_heart, (110, 30))
+        
+        def get_dark_heart_2(self):
+            screen.blit(self.dark_heart, (70, 30))
+
+        def get_dark_heart_1(self):
+            screen.blit(self.dark_heart, (30, 30))
+
+        
+        def get_score(self):
+            score_text = text.render(f"Score : {self.score}", True, (20, 120, 220))
+            screen.blit(score_text, (780, 30))
+
+        def get_level(self):
+            level_text = text.render(f"Level : {self.level}", True, (200, 200, 200))
+            screen.blit(level_text, (400, 20))
+
+    health = 3
+    score = 0
+    level = 1
+
+    heart = pygame.image.load("heart.png")
+    dark_heart = pygame.image.load("dark_heart.png")
+
+    Special = Static(heart, dark_heart, score, level)
+
+    # Game over
+    over_text = pygame.font.Font("freesansbold.ttf", 64)
+
+    def Game_over():
+        gameover_text = over_text.render("Game Over!", True, (240, 240, 240))
+        screen.blit(gameover_text, (310, 340))
+
+    # Sound
+    bullet_shooting = pygame.mixer.Sound("bullet_shooting.wav")
+    enemy_bullet_shooting = pygame.mixer.Sound("enemy_bullet_shooting.wav")
+    spaceship_hitted = pygame.mixer.Sound("spaceship_hitted.wav")
+    enemy_hitted = pygame.mixer.Sound("enemy_hitted.wav")
+    dead = pygame.mixer.Sound("dying.wav")
+
+    ded = True
+    sht = True
+
+    z = True
+    alpha = False
+
+    e = True
+    zeta = False
+
+    go = True
+
+    running = True
+    while running:
+        screen.blit(background, (0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            # Moving
+            if event.type == pygame.KEYDOWN and go:
+                if event.key == pygame.K_LEFT and DONE_1.me_X > 0:
+                    x_change = -1
+
+                if event.key == pygame.K_RIGHT and DONE_1.me_X < 934:
+                    x_change = 1
+
+                if event.key == pygame.K_UP and DONE_1.me_Y > 0:
+                    y_change = -1
+
+                if event.key == pygame.K_DOWN and DONE_1.me_Y < 734:
+                    y_change = 1
+
+                # Shooting
+                if event.key == pygame.K_SPACE:
+                    bullet_shooting.play()
+                    z = False
+                    alpha = True
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    x_change = 0
+
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    y_change = 0
+
+        if go:
+            DONE_1.me_X += x_change
+            DONE_1.me_Y += y_change
+
+            if z:
+                DONE_1.bullet_X += x_change
+                DONE_1.bullet_Y += y_change
+
+            if alpha:
+                DONE_1.bullet_Y -= 2
+
+                if DONE_1.bullet_Y <= 0:
+                    alpha = False
+                    z = True
+                    DONE_1.bullet_X = DONE_1.me_X + 16
+                    DONE_1.bullet_Y = DONE_1.me_Y + 5
+
+
+            if DONE_1.me_X <= 0 or DONE_1.me_X >= 934:
+                x_change = 0
+
+            if DONE_1.me_Y <= 0 or DONE_1.me_Y >= 734:
+                y_change = 0
+
+            # Enemy moving
+            DONE_2.enemy_1_X += enemy_1_x_change
+
+            if DONE_2.enemy_1_X >= 934:
+                enemy_1_x_change = -0.8
+
+            elif DONE_2.enemy_1_X <= 0:
+                enemy_1_x_change = 0.8
+
+            # Enemy shooting
+            DONE_2.bullet_1_Y += 1.5
+            if sht:
+                enemy_bullet_shooting.play()
+                sht = False
+
+            if DONE_2.bullet_1_Y >= 768:
+                sht = True
+                DONE_2.bullet_1_X = DONE_2.enemy_1_X
+                DONE_2.bullet_1_Y = DONE_2.enemy_1_Y
+
+            if Special.score >= 10:
+                Special.level == 2
+
+                DONE_2.enemy_2_X += enemy_2_x_change
+
+                if DONE_2.enemy_2_X >= 934:
+                    enemy_2_x_change = -1.2
+                    DONE_2.enemy_2_Y += 50
+
+                elif DONE_2.enemy_2_X <= 0:
+                    enemy_2_x_change = 1.2
+                    DONE_2.enemy_2_Y += 50
+
+                DONE_2.get_enemy_2()
+
+
+        DONE_1.get_bullet_1()
+        DONE_1.get_me()
+
+        DONE_2.get_bullet_1()
+        DONE_2.get_enemy_1()
+
+        # HP
+        if health == 3:
+            Special.get_heart_1()
+            Special.get_heart_2()
+            Special.get_heart_3()
+
+        elif health == 2:
+            Special.get_heart_1()
+            Special.get_heart_2()
+            Special.get_dark_heart_3()
+
+        elif health == 1:
+            Special.get_heart_1()
+            Special.get_dark_heart_2()
+            Special.get_dark_heart_3()
+
+        else:
+            Special.get_dark_heart_3()
+            Special.get_dark_heart_1()
+            Special.get_dark_heart_2()
+            Game_over()
+            if Special.score >= 10:
+                DONE_2.get_enemy_2()
+            go = False
+            if ded:
+                dead.play()
+                ded = False
+
+        # Damage
+        if DONE_1.bullet_X - 27 < DONE_2.enemy_1_X and DONE_1.bullet_X + 27 > DONE_2.enemy_1_X and DONE_1.bullet_Y - 27 < DONE_2.enemy_1_Y and DONE_1.bullet_Y + 27 > DONE_2.enemy_1_Y:
+            enemy_hitted.play()
+            Special.score += 1
+            alpha = False
+            z = True
+            DONE_1.bullet_X = DONE_1.me_X + 16
+            DONE_1.bullet_Y = DONE_1.me_Y + 5
+
+        if DONE_2.bullet_1_X - 27 < DONE_1.me_X and DONE_2.bullet_1_X + 27 > DONE_1.me_X and DONE_2.bullet_1_Y - 27 < DONE_1.me_Y and DONE_2.bullet_1_Y + 27 > DONE_1.me_Y:
+            spaceship_hitted.play()
+            health -= 1
+            DONE_2.bullet_1_X = DONE_2.enemy_1_X
+            DONE_2.bullet_1_Y = DONE_2.enemy_1_Y
+
+
+        if DONE_1.me_X - 32 < DONE_2.enemy_1_X and DONE_1.me_X + 45 > DONE_2.enemy_1_X and DONE_1.me_Y - 32 < DONE_2.enemy_1_Y and DONE_1.me_Y + 45 > DONE_2.enemy_1_Y:
+            DONE_2.enemy_1_X = 440
+            DONE_2.enemy_1_Y = 120
+            health -= 1
+            spaceship_hitted.play()        
+
+        if Special.score >= 10:
+            Special.level = 2
+
+            if DONE_1.me_X - 32 < DONE_2.enemy_2_X and DONE_1.me_X + 42 > DONE_2.enemy_2_X and DONE_1.me_Y - 32 < DONE_2.enemy_2_Y and DONE_1.me_Y + 42 > DONE_2.enemy_2_Y:
+                DONE_2.enemy_2_X = 300
+                DONE_2.enemy_2_Y = 200
+                health -= 1
+                spaceship_hitted.play()
+
+            if DONE_1.bullet_X - 27 < DONE_2.enemy_2_X and DONE_1.bullet_X + 27 > DONE_2.enemy_2_X and DONE_1.bullet_Y - 27 < DONE_2.enemy_2_Y and DONE_1.bullet_Y + 27 > DONE_2.enemy_2_Y:
+                enemy_hitted.play()
+                Special.score += 1
+                alpha = False
+                z = True
+                DONE_1.bullet_X = DONE_1.me_X + 16
+                DONE_1.bullet_Y = DONE_1.me_Y + 5
+                DONE_2.enemy_2_X = 300
+                DONE_2.enemy_2_Y = 200
+
+        Special.get_score()
+        Special.get_level()
+
+        pygame.display.update()
